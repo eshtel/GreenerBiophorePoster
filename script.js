@@ -191,3 +191,18 @@ function loadNotesFromFirebase() {
 window.onload = function() {
     loadNotesFromFirebase();
 };
+
+// Load notes from Firebase
+firebase.database().ref('notes').on('child_added', function(snapshot) {
+    const note = snapshot.val();
+    const tableId = note.tableId;
+    const noteText = note.noteText;
+    const timestamp = note.timestamp;
+
+    const tableBody = document.querySelector(`#${tableId} tbody`);
+    const newRow = document.createElement('tr');
+    const newCell = document.createElement('td');
+    newCell.innerHTML = `${noteText} <span style="font-size: 0.8em; color: gray;">(${timestamp})</span>`;
+    newRow.appendChild(newCell);
+    tableBody.appendChild(newRow);
+});
