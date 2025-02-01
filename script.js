@@ -14,7 +14,7 @@ const firebaseConfig = {
 const app = firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-// Load notes from Firebase and display them
+// Load existing notes from Firebase when the page loads
 function loadNotesFromFirebase() {
     const tableIds = ['table1', 'table2', 'table3', 'table4'];
 
@@ -28,7 +28,7 @@ function loadNotesFromFirebase() {
     });
 }
 
-// Function to update the note in the UI
+// Function to update the note in the UI (from Firebase)
 function updateNoteInUI(tableId, noteData, noteId) {
     const tableBody = document.querySelector(`#${tableId} tbody`);
     const newRow = document.createElement('tr');
@@ -62,7 +62,7 @@ function updateNoteInUI(tableId, noteData, noteId) {
     tableBody.appendChild(newRow);
 }
 
-// Function to add a note to a specific table
+// Function to handle adding a note
 function addNote(tableId) {
     const tableBody = document.querySelector(`#${tableId} tbody`);
     
@@ -91,7 +91,7 @@ function addNote(tableId) {
             const now = new Date();
             const formattedDate = now.toLocaleString(); // Format date as needed
 
-            // Save note to Firebase
+            // Save the note to Firebase
             saveNoteToFirebase(tableId, noteText, formattedDate);
 
             // Clear the textarea after submission
