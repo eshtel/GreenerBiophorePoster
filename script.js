@@ -1,3 +1,15 @@
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+    apiKey: "AIzaSyBQK0FdOyh4gzSZdF_CGDsD_uu2mPbTMMk",
+    authDomain: "greenbiophore.firebaseapp.com",
+    databaseURL: "https://greenbiophore-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "greenbiophore",
+    storageBucket: "greenbiophore.firebasestorage.app",
+    messagingSenderId: "1050918884464",
+    appId: "1:1050918884464:web:56bfbe6f6c33212baf10b5",
+    measurementId: "G-6C85CGSHFF"
+  };
+
 // Function to add a note to a specific table
 function addNote(tableId) {
     // Get the table body element by its table ID
