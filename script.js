@@ -1,17 +1,17 @@
-// Import necessary Firebase functions
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+// Import necessary Firebase functions from the modular SDK
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
+import { getDatabase, ref, push, onValue } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js';
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBQK0FdOyh4gzSZdF_CGDsD_uu2mPbTMMk",
-  authDomain: "greenbiophore.firebaseapp.com",
-  databaseURL: "https://greenbiophore-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "greenbiophore",
-  storageBucket: "greenbiophore.firebasestorage.app",
-  messagingSenderId: "1050918884464",
-  appId: "1:1050918884464:web:56bfbe6f6c33212baf10b5",
-  measurementId: "G-6C85CGSHFF"
+    apiKey: "AIzaSyBQK0FdOyh4gzSZdF_CGDsD_uu2mPbTMMk",
+    authDomain: "greenbiophore.firebaseapp.com",
+    databaseURL: "https://greenbiophore-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "greenbiophore",
+    storageBucket: "greenbiophore.firebasestorage.app",
+    messagingSenderId: "1050918884464",
+    appId: "1:1050918884464:web:56bfbe6f6c33212baf10b5",
+    measurementId: "G-6C85CGSHFF"
 };
 
 // Initialize Firebase
