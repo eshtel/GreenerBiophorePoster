@@ -4,7 +4,7 @@ const firebaseConfig = {
     authDomain: "greenbiophore.firebaseapp.com",
     databaseURL: "https://greenbiophore-default-rtdb.europe-west1.firebasedatabase.app",
     projectId: "greenbiophore",
-    storageBucket: "greenbiophore.appspot.com",
+    storageBucket: "greenbiophore.firebasestorage.app",
     messagingSenderId: "1050918884464",
     appId: "1:1050918884464:web:56bfbe6f6c33212baf10b5",
     measurementId: "G-6C85CGSHFF"
@@ -43,8 +43,10 @@ function addNote(tableId) {
             const now = new Date();
             const formattedDate = now.toLocaleString(); // Format date as needed
 
-            // Add the note with the timestamp
+            // Add the note with the timestamp and background color
             newCell.innerHTML = `${noteText} <span style="font-size: 0.8em; color: gray;">(${formattedDate})</span>`;
+
+            // Set a background color for the note
             newCell.style.backgroundColor = '#ffffff85'; // color
             newCell.style.padding = '10px'; // Add some padding for the note
 
@@ -54,7 +56,7 @@ function addNote(tableId) {
             alert("Please enter a note!");
         }
     }
-
+            
     // When the user clicks "Submit"
     submitButton.addEventListener('click', submitNote);
 
@@ -71,7 +73,11 @@ function addNote(tableId) {
 function saveNoteToFirebase(tableId, noteText, formattedDate) {
     const noteData = {
         text: noteText,
-        date: formattedDate
+        date: formattedDate,
+        votes: {
+            thumbsUp: 0,
+            thumbsDown: 0
+        }
     };
 
     // Save the note under the correct tableId in Firebase
@@ -94,7 +100,6 @@ function loadNotesFromFirebase() {
             newCell.innerHTML = `${noteData.text} <span style="font-size: 0.8em; color: gray;">(${noteData.date})</span>`;
             newCell.style.backgroundColor = '#ffffff85';
             newCell.style.padding = '10px';
-
             newRow.appendChild(newCell);
             tableBody.appendChild(newRow);
         });
