@@ -8,9 +8,8 @@
     
     <!-- Firebase SDK for modular setup -->
     <script type="module">
-        // Firebase configuration (replace with your own config)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getDatabase, ref, push, onChildAdded, set, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyBQK0FdOyh4gzSZdF_CGDsD_uu2mPbTMMk",
@@ -98,44 +97,32 @@
             push(tableRef, noteData); // Firebase will automatically generate a unique key
         }
 
-        // Load notes from Firebase and display them
+        // Function to load notes from Firebase and display them
         function loadNotesFromFirebase() {
             const tableIds = ['table1', 'table2', 'table3', 'table4'];
 
             tableIds.forEach(function (tableId) {
                 const tableRef = ref(database, tableId);
-                onChildAdded(tableRef, function (snapshot) {
-                    const noteData = snapshot.val();
+                onValue(tableRef, function (snapshot) {
                     const tableBody = document.querySelector(`#${tableId} tbody`);
-                    const newRow = document.createElement('tr');
-                    const newCell = document.createElement('td');
+                    tableBody.innerHTML = ''; // Clear current content before adding fetched notes
+                    snapshot.forEach(function(childSnapshot) {
+                        const noteData = childSnapshot.val();
+                        const newRow = document.createElement('tr');
+                        const newCell = document.createElement('td');
 
-                    newCell.innerHTML = `${noteData.text} <span style="font-size: 0.8em; color: gray;">(${noteData.date})</span>`;
-                    newCell.style.backgroundColor = '#ffffff85';
-                    newCell.style.padding = '10px';
+                        newCell.innerHTML = `${noteData.text} <span style="font-size: 0.8em; color: gray;">(${noteData.date})</span>`;
+                        newCell.style.backgroundColor = '#ffffff85';
+                        newCell.style.padding = '10px';
 
-                    // Add vote buttons (Thumbs Up and Thumbs Down)
-                    const voteContainer = document.createElement('div');
+                        // Add vote counts
+                        const voteCount = document.createElement('span');
+                        voteCount.innerHTML = `Votes: <span class="thumbsUpCount">${noteData.votes.thumbsUp}</span> 👍 / <span class="thumbsDownCount">${noteData.votes.thumbsDown}</span> 👎`;
+                        newCell.appendChild(voteCount);
 
-                    const thumbsUpButton = document.createElement('button');
-                    thumbsUpButton.innerHTML = '👍';
-                    thumbsUpButton.style.marginRight = '10px';
-                    voteContainer.appendChild(thumbsUpButton);
-
-                    const thumbsDownButton = document.createElement('button');
-                    thumbsDownButton.innerHTML = '👎';
-                    voteContainer.appendChild(thumbsDownButton);
-
-                    // Add vote counts
-                    const voteCount = document.createElement('span');
-                    voteCount.style.marginLeft = '10px';
-                    voteCount.innerHTML = `Votes: <span class="thumbsUpCount">${noteData.votes.thumbsUp}</span> 👍 / <span class="thumbsDownCount">${noteData.votes.thumbsDown}</span> 👎`;
-                    voteContainer.appendChild(voteCount);
-
-                    // Append the vote container to the note cell
-                    newCell.appendChild(voteContainer);
-                    newRow.appendChild(newCell);
-                    tableBody.appendChild(newRow);
+                        newRow.appendChild(newCell);
+                        tableBody.appendChild(newRow);
+                    });
                 });
             });
         }
@@ -145,6 +132,7 @@
             loadNotesFromFirebase();
         };
     </script>
+
 </head>
 <body>
 
@@ -204,9 +192,6 @@
             </tbody>
         </table>
     </div>
-
-    <!-- Add the Firebase SDK with modular imports -->
-    <script type="module" src="script.js"></script>
 
 </body>
 </html>
