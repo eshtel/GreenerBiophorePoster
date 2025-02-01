@@ -12,8 +12,6 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = firebase.initializeApp(firebaseConfig);
-
-// Reference to your Firebase Realtime Database
 const database = firebase.database();
 
 // Function to add a note to a specific table
