@@ -1,4 +1,4 @@
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// Firebase configuration (replace this with your Firebase config object)
 const firebaseConfig = {
     apiKey: "AIzaSyBQK0FdOyh4gzSZdF_CGDsD_uu2mPbTMMk",
     authDomain: "greenbiophore.firebaseapp.com",
@@ -8,14 +8,16 @@ const firebaseConfig = {
     messagingSenderId: "1050918884464",
     appId: "1:1050918884464:web:56bfbe6f6c33212baf10b5",
     measurementId: "G-6C85CGSHFF"
-  };
+};
 
 // Initialize Firebase
 const app = firebase.initializeApp(firebaseConfig);
 
+// Reference to your Firebase Realtime Database
+const database = firebase.database();
+
 // Function to add a note to a specific table
 function addNote(tableId) {
-    // Get the table body element by its table ID
     const tableBody = document.querySelector(`#${tableId} tbody`);
     
     // Create a new row for the note
@@ -128,24 +130,24 @@ function saveNoteToFirebase(tableId, noteText, formattedDate) {
         }
     };
 
+    // Save the note under the correct tableId in Firebase
     const tableRef = database.ref(tableId);
-    tableRef.push(noteData);
+    tableRef.push(noteData); // Firebase will automatically generate a unique key
 }
 
 // Function to save the vote to Firebase
 function saveVoteToFirebase(tableId, thumbsUpCount, thumbsDownCount) {
-    const voteData = {
-        thumbsUp: thumbsUpCount,
-        thumbsDown: thumbsDownCount
-    };
-
-    // Assuming each note has a unique ID, we'll update the corresponding note in Firebase
+    // You need to retrieve the correct noteId to update the vote for a specific note
+    // Currently, this is just an example, you should replace it with the actual note ID
     const noteId = "the-id-of-the-note";  // You will need to dynamically assign the note's ID
     const noteRef = database.ref(`${tableId}/${noteId}`);
-    noteRef.update(voteData);
+    noteRef.update({
+        thumbsUp: thumbsUpCount,
+        thumbsDown: thumbsDownCount
+    });
 }
 
-// Load notes from Firebase
+// Load notes from Firebase and display them
 function loadNotesFromFirebase() {
     const tableIds = ['table1', 'table2', 'table3', 'table4'];
 
@@ -191,18 +193,3 @@ function loadNotesFromFirebase() {
 window.onload = function() {
     loadNotesFromFirebase();
 };
-
-// Load notes from Firebase
-firebase.database().ref('notes').on('child_added', function(snapshot) {
-    const note = snapshot.val();
-    const tableId = note.tableId;
-    const noteText = note.noteText;
-    const timestamp = note.timestamp;
-
-    const tableBody = document.querySelector(`#${tableId} tbody`);
-    const newRow = document.createElement('tr');
-    const newCell = document.createElement('td');
-    newCell.innerHTML = `${noteText} <span style="font-size: 0.8em; color: gray;">(${timestamp})</span>`;
-    newRow.appendChild(newCell);
-    tableBody.appendChild(newRow);
-});
