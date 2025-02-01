@@ -10,6 +10,9 @@ const firebaseConfig = {
     measurementId: "G-6C85CGSHFF"
   };
 
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+
 // Function to add a note to a specific table
 function addNote(tableId) {
     // Get the table body element by its table ID
@@ -78,6 +81,9 @@ function addNote(tableId) {
                 thumbsUpElements.forEach(function (thumbsUpElement) {
                     thumbsUpElement.innerText = thumbsUpCount;
                 });
+
+                // Update the vote count in Firebase
+                saveVoteToFirebase(tableId, thumbsUpCount, thumbsDownCount);
             });
 
             // Thumbs Down button event listener
@@ -87,7 +93,13 @@ function addNote(tableId) {
                 thumbsDownElements.forEach(function (thumbsDownElement) {
                     thumbsDownElement.innerText = thumbsDownCount;
                 });
+
+                // Update the vote count in Firebase
+                saveVoteToFirebase(tableId, thumbsUpCount, thumbsDownCount);
             });
+
+            // Save note to Firebase
+            saveNoteToFirebase(tableId, noteText, formattedDate);
         } else {
             alert("Please enter a note!");
         }
@@ -104,3 +116,78 @@ function addNote(tableId) {
         }
     });
 }
+
+// Function to save the note to Firebase
+function saveNoteToFirebase(tableId, noteText, formattedDate) {
+    const noteData = {
+        text: noteText,
+        date: formattedDate,
+        votes: {
+            thumbsUp: 0,
+            thumbsDown: 0
+        }
+    };
+
+    const tableRef = database.ref(tableId);
+    tableRef.push(noteData);
+}
+
+// Function to save the vote to Firebase
+function saveVoteToFirebase(tableId, thumbsUpCount, thumbsDownCount) {
+    const voteData = {
+        thumbsUp: thumbsUpCount,
+        thumbsDown: thumbsDownCount
+    };
+
+    // Assuming each note has a unique ID, we'll update the corresponding note in Firebase
+    const noteId = "the-id-of-the-note";  // You will need to dynamically assign the note's ID
+    const noteRef = database.ref(`${tableId}/${noteId}`);
+    noteRef.update(voteData);
+}
+
+// Load notes from Firebase
+function loadNotesFromFirebase() {
+    const tableIds = ['table1', 'table2', 'table3', 'table4'];
+
+    tableIds.forEach(function (tableId) {
+        const tableRef = database.ref(tableId);
+        tableRef.on('child_added', function (snapshot) {
+            const noteData = snapshot.val();
+            const tableBody = document.querySelector(`#${tableId} tbody`);
+            const newRow = document.createElement('tr');
+            const newCell = document.createElement('td');
+
+            newCell.innerHTML = `${noteData.text} <span style="font-size: 0.8em; color: gray;">(${noteData.date})</span>`;
+            newCell.style.backgroundColor = '#ffffff85';
+            newCell.style.padding = '10px';
+
+            // Add vote buttons (Thumbs Up and Thumbs Down)
+            const voteContainer = document.createElement('div');
+            
+            const thumbsUpButton = document.createElement('button');
+            thumbsUpButton.innerHTML = '👍';
+            thumbsUpButton.style.marginRight = '10px';
+            voteContainer.appendChild(thumbsUpButton);
+            
+            const thumbsDownButton = document.createElement('button');
+            thumbsDownButton.innerHTML = '👎';
+            voteContainer.appendChild(thumbsDownButton);
+
+            // Add vote counts
+            const voteCount = document.createElement('span');
+            voteCount.style.marginLeft = '10px';
+            voteCount.innerHTML = `Votes: <span class="thumbsUpCount">${noteData.votes.thumbsUp}</span> 👍 / <span class="thumbsDownCount">${noteData.votes.thumbsDown}</span> 👎`;
+            voteContainer.appendChild(voteCount);
+
+            // Append the vote container to the note cell
+            newCell.appendChild(voteContainer);
+            newRow.appendChild(newCell);
+            tableBody.appendChild(newRow);
+        });
+    });
+}
+
+// Call this function when the page loads to load existing notes from Firebase
+window.onload = function() {
+    loadNotesFromFirebase();
+};
