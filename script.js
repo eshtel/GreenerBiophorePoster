@@ -82,8 +82,20 @@ function saveNoteToFirebase(tableId, noteText, formattedDate) {
 
     // Save the note under the correct tableId in Firebase
     const tableRef = database.ref(tableId);
-    tableRef.push(noteData); // Firebase will automatically generate a unique key
+    
+    // Log the note data to the console
+    console.log("Saving note to Firebase:", noteData);
+
+    // Push the note to the database
+    tableRef.push(noteData)
+        .then(() => {
+            console.log("Note successfully saved to Firebase!");
+        })
+        .catch((error) => {
+            console.error("Error saving note to Firebase:", error);
+        });
 }
+
 
 // Load notes from Firebase and display them
 function loadNotesFromFirebase() {
