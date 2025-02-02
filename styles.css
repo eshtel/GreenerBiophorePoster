@@ -78,7 +78,7 @@ span {
 .single-column-table {
     width: 100%;  /* Ensure the tables are 100% of their container's width */
     table-layout: fixed; /* Prevents columns from expanding */
-    background-color: #f0f0f095;
+    background-color: #9c218e95;
 }
 
 /* Set a maximum width for table cells and ensure text wraps */
