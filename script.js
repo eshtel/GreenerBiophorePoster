@@ -12,6 +12,8 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = firebase.initializeApp(firebaseConfig);
+
+// Reference to your Firebase Realtime Database
 const database = firebase.database();
 
 // Function to add a note to a specific table
@@ -49,6 +51,54 @@ function addNote(tableId) {
             // Set a background color for the note
             newCell.style.backgroundColor = '#ffffff85'; // color
             newCell.style.padding = '10px'; // Add some padding for the note
+            
+            // Create vote buttons (Thumbs Up and Thumbs Down)
+            const voteContainer = document.createElement('div');
+            
+            const thumbsUpButton = document.createElement('button');
+            thumbsUpButton.innerHTML = '👍';
+            thumbsUpButton.style.marginRight = '10px';
+            voteContainer.appendChild(thumbsUpButton);
+            
+            const thumbsDownButton = document.createElement('button');
+            thumbsDownButton.innerHTML = '👎';
+            voteContainer.appendChild(thumbsDownButton);
+
+            // Add vote counts
+            const voteCount = document.createElement('span');
+            voteCount.style.marginLeft = '10px';
+            voteCount.innerHTML = 'Votes: <span class="thumbsUpCount">0</span> 👍 / <span class="thumbsDownCount">0</span> 👎';
+            voteContainer.appendChild(voteCount);
+
+            // Append the vote container to the note cell
+            newCell.appendChild(voteContainer);
+
+            let thumbsUpCount = 0;
+            let thumbsDownCount = 0;
+
+            // Thumbs Up button event listener
+            thumbsUpButton.addEventListener('click', function () {
+                thumbsUpCount++;
+                const thumbsUpElements = newCell.querySelectorAll('.thumbsUpCount');
+                thumbsUpElements.forEach(function (thumbsUpElement) {
+                    thumbsUpElement.innerText = thumbsUpCount;
+                });
+
+                // Update the vote count in Firebase
+                saveVoteToFirebase(tableId, thumbsUpCount, thumbsDownCount);
+            });
+
+            // Thumbs Down button event listener
+            thumbsDownButton.addEventListener('click', function () {
+                thumbsDownCount++;
+                const thumbsDownElements = newCell.querySelectorAll('.thumbsDownCount');
+                thumbsDownElements.forEach(function (thumbsDownElement) {
+                    thumbsDownElement.innerText = thumbsDownCount;
+                });
+
+                // Update the vote count in Firebase
+                saveVoteToFirebase(tableId, thumbsUpCount, thumbsDownCount);
+            });
 
             // Save note to Firebase
             saveNoteToFirebase(tableId, noteText, formattedDate);
@@ -56,7 +106,7 @@ function addNote(tableId) {
             alert("Please enter a note!");
         }
     }
-            
+
     // When the user clicks "Submit"
     submitButton.addEventListener('click', submitNote);
 
@@ -85,6 +135,18 @@ function saveNoteToFirebase(tableId, noteText, formattedDate) {
     tableRef.push(noteData); // Firebase will automatically generate a unique key
 }
 
+// Function to save the vote to Firebase
+function saveVoteToFirebase(tableId, thumbsUpCount, thumbsDownCount) {
+    // You need to retrieve the correct noteId to update the vote for a specific note
+    // Currently, this is just an example, you should replace it with the actual note ID
+    const noteId = "the-id-of-the-note";  // You will need to dynamically assign the note's ID
+    const noteRef = database.ref(`${tableId}/${noteId}`);
+    noteRef.update({
+        thumbsUp: thumbsUpCount,
+        thumbsDown: thumbsDownCount
+    });
+}
+
 // Load notes from Firebase and display them
 function loadNotesFromFirebase() {
     const tableIds = ['table1', 'table2', 'table3', 'table4'];
@@ -100,6 +162,27 @@ function loadNotesFromFirebase() {
             newCell.innerHTML = `${noteData.text} <span style="font-size: 0.8em; color: gray;">(${noteData.date})</span>`;
             newCell.style.backgroundColor = '#ffffff85';
             newCell.style.padding = '10px';
+
+            // Add vote buttons (Thumbs Up and Thumbs Down)
+            const voteContainer = document.createElement('div');
+            
+            const thumbsUpButton = document.createElement('button');
+            thumbsUpButton.innerHTML = '👍';
+            thumbsUpButton.style.marginRight = '10px';
+            voteContainer.appendChild(thumbsUpButton);
+            
+            const thumbsDownButton = document.createElement('button');
+            thumbsDownButton.innerHTML = '👎';
+            voteContainer.appendChild(thumbsDownButton);
+
+            // Add vote counts
+            const voteCount = document.createElement('span');
+            voteCount.style.marginLeft = '10px';
+            voteCount.innerHTML = `Votes: <span class="thumbsUpCount">${noteData.votes.thumbsUp}</span> 👍 / <span class="thumbsDownCount">${noteData.votes.thumbsDown}</span> 👎`;
+            voteContainer.appendChild(voteCount);
+
+            // Append the vote container to the note cell
+            newCell.appendChild(voteContainer);
             newRow.appendChild(newCell);
             tableBody.appendChild(newRow);
         });
