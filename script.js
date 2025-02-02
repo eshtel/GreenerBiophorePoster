@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getDatabase, ref, push, onChildAdded, update, orderByChild, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { getDatabase, ref, push, onChildAdded, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -74,7 +74,6 @@ function loadNotesFromFirebase() {
     tableIds.forEach(tableId => {
         const tableRef = ref(database, tableId);
 
-        // Query Firebase to order the notes by thumbsUp votes in descending order
         onChildAdded(tableRef, (snapshot) => {
             const noteData = snapshot.val();
             const noteId = snapshot.key;
@@ -110,40 +109,52 @@ function loadNotesFromFirebase() {
             newRow.appendChild(newCell);
             tableBody.appendChild(newRow);
 
-            // Prevent user from voting more than once
-            if (hasUserVoted(noteId)) {
-                thumbsUpButton.disabled = true;
-                thumbsDownButton.disabled = true;
-            }
-
             // Handle voting for thumbs up
             thumbsUpButton.addEventListener('click', function () {
-                if (!hasUserVoted(noteId)) {
+                if (hasUserVoted(noteId)) {
+                    // If already voted, toggle the vote
+                    if (noteData.votes.thumbsUp > 0) {
+                        noteData.votes.thumbsUp--;
+                    } else {
+                        noteData.votes.thumbsUp++;
+                    }
+                    updateVoteInFirebase(tableId, noteId, noteData.votes);
+                } else {
+                    // If not voted, vote for thumbs up
                     noteData.votes.thumbsUp++;
                     updateVoteInFirebase(tableId, noteId, noteData.votes);
                     saveVoteStatus(noteId); // Save user's vote to prevent multiple votes
-
-                    // Update the UI with new vote counts
-                    const thumbsUpElements = newCell.querySelectorAll('.thumbsUpCount');
-                    thumbsUpElements.forEach(function (thumbsUpElement) {
-                        thumbsUpElement.innerText = noteData.votes.thumbsUp;
-                    });
                 }
+
+                // Update the UI with new vote counts
+                const thumbsUpElements = newCell.querySelectorAll('.thumbsUpCount');
+                thumbsUpElements.forEach(function (thumbsUpElement) {
+                    thumbsUpElement.innerText = noteData.votes.thumbsUp;
+                });
             });
 
             // Handle voting for thumbs down
             thumbsDownButton.addEventListener('click', function () {
-                if (!hasUserVoted(noteId)) {
+                if (hasUserVoted(noteId)) {
+                    // If already voted, toggle the vote
+                    if (noteData.votes.thumbsDown > 0) {
+                        noteData.votes.thumbsDown--;
+                    } else {
+                        noteData.votes.thumbsDown++;
+                    }
+                    updateVoteInFirebase(tableId, noteId, noteData.votes);
+                } else {
+                    // If not voted, vote for thumbs down
                     noteData.votes.thumbsDown++;
                     updateVoteInFirebase(tableId, noteId, noteData.votes);
                     saveVoteStatus(noteId); // Save user's vote to prevent multiple votes
-
-                    // Update the UI with new vote counts
-                    const thumbsDownElements = newCell.querySelectorAll('.thumbsDownCount');
-                    thumbsDownElements.forEach(function (thumbsDownElement) {
-                        thumbsDownElement.innerText = noteData.votes.thumbsDown;
-                    });
                 }
+
+                // Update the UI with new vote counts
+                const thumbsDownElements = newCell.querySelectorAll('.thumbsDownCount');
+                thumbsDownElements.forEach(function (thumbsDownElement) {
+                    thumbsDownElement.innerText = noteData.votes.thumbsDown;
+                });
             });
         });
     });

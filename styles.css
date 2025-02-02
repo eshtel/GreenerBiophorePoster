@@ -1,18 +1,23 @@
 /* Header Style */
 .header {
     width: 100%;                    /* Make the header span the full width of the page */
-    background-color: hsl(200, 94%, 18%);      /* Set the background color of the header (green for example) */
+    background-color: hsl(101, 10%, 62%);      /* Set the background color of the header (green for example) */
     color: white;                   /* Set the text color to white */
     padding: 10px 0;                
     text-align: center;             
-    font-size: 1rem;              
+    font-size: 2rem;              
     font-weight: bold;             
 }
 
+.subheading {
+    font-size: 1rem; /* Smaller font size */
+    color: #ffffff;   /* White text color (or any color you prefer) */
+    margin-top: 10px; /* Adds some space between the heading and the subheading */
+}
 
 body {
     font-family: Arial, sans-serif;
-    background: url('Pictures/Background.jpeg') no-repeat center center fixed;
+    background: url('Pictures/Background2.jpeg') no-repeat center center fixed;
     background-size: cover;
     padding: 20px;
     display: flex;
@@ -25,21 +30,21 @@ th { /*table header*/
     border: 0px solid #000;     
     padding: 10px;                
     text-align: center;   
-    color: white;        
-    background-color: hsl(200, 94%, 18%);    
+    color: rgb(0, 0, 0);        
+    background-color: #f1ebdd;    
 }
 
 button {
     margin-top: 10px;
     padding: 5px 10px;
-    background-color: hsla(200, 93%, 18%, 0.491);
+    background-color: hsl(101, 10%, 62%);
     color: white;
     border: none;
     cursor: pointer;
 }
 
 button:hover {
-    background-color: hsl(200, 94%, 18%);
+    background-color: #eecbbf;
 }
 
 textarea {
@@ -78,7 +83,7 @@ span {
 .single-column-table {
     width: 100%;  /* Ensure the tables are 100% of their container's width */
     table-layout: fixed; /* Prevents columns from expanding */
-    background-color: #9c218e95;
+    background-color: #f0f0f095;
 }
 
 /* Set a maximum width for table cells and ensure text wraps */
