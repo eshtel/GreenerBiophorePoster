@@ -7,55 +7,68 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Header Section -->
+    <div class="header">
+        <h1>Greener Biophore</h1>
+    </div>
 
-    <h1>Greener Biophore</h1>
+    <div id="table1">
+        <table class="single-column-table">
+            <thead><tr><th>Research I (consummables)</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <button onclick="addNote('table1')">➕ Add Note</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
-    <button onclick="addNote('table1')">Add Note to Table 1</button>
-    <button onclick="addNote('table2')">Add Note to Table 2</button>
-    <button onclick="addNote('table3')">Add Note to Table 3</button>
-    <button onclick="addNote('table4')">Add Note to Table 4</button>
+    <div id="table2">
+        <table class="single-column-table">
+            <thead><tr><th>Research II (values)</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <button onclick="addNote('table2')">➕ Add Note</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
-    <table id="table1">
-        <thead>
-            <tr>
-                <th>Table 1 Notes</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
+    <div id="table3">
+        <table class="single-column-table">
+            <thead><tr><th>Mobility</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <button onclick="addNote('table3')">➕ Add Note</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
-    <table id="table2">
-        <thead>
-            <tr>
-                <th>Table 2 Notes</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
+    <div id="table4">
+        <table class="single-column-table">
+            <thead><tr><th>Spaces/Building</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <button onclick="addNote('table4')">➕ Add Note</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
-    <table id="table3">
-        <thead>
-            <tr>
-                <th>Table 3 Notes</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
+    <!-- Link to the Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
 
-    <table id="table4">
-        <thead>
-            <tr>
-                <th>Table 4 Notes</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-
-    <!-- Link to the JavaScript file -->
-    <script src="script.js" type="module"></script>
+    <!-- Link to your custom script -->
+    <script src="script.js"></script>
 </body>
 </html>

@@ -1,52 +1,52 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-
-// Firebase configuration
+// Firebase configuration (replace this with your Firebase config object)
 const firebaseConfig = {
     apiKey: "AIzaSyBQK0FdOyh4gzSZdF_CGDsD_uu2mPbTMMk",
     authDomain: "greenbiophore.firebaseapp.com",
     databaseURL: "https://greenbiophore-default-rtdb.europe-west1.firebasedatabase.app",
     projectId: "greenbiophore",
-    storageBucket: "greenbiophore.appspot.com",
+    storageBucket: "greenbiophore.firebasestorage.app",
     messagingSenderId: "1050918884464",
     appId: "1:1050918884464:web:56bfbe6f6c33212baf10b5",
     measurementId: "G-6C85CGSHFF"
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
+const app = firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
 
 // Function to add a note to a specific table
 function addNote(tableId) {
     const tableBody = document.querySelector(`#${tableId} tbody`);
-
+    
     // Create a new row for the note
     const newRow = document.createElement('tr');
     const newCell = document.createElement('td');
-
+    
     // Create the textarea for note input
     const textarea = document.createElement('textarea');
     textarea.placeholder = 'Type your note here...';
     newCell.appendChild(textarea);
-
+    
     // Add the submit button
     const submitButton = document.createElement('button');
     submitButton.innerText = 'Submit';
     newCell.appendChild(submitButton);
+    
     newRow.appendChild(newCell);
     tableBody.appendChild(newRow);
-
+    
     // Function to handle the note submission
     function submitNote() {
         const noteText = textarea.value.trim();
         if (noteText) {
             // Get the current date and time
             const now = new Date();
-            const formattedDate = now.toLocaleString();
+            const formattedDate = now.toLocaleString(); // Format date as needed
 
             // Add the note with the timestamp and background color
-            newCell.innerHTML = `${noteText}<br>(${formattedDate})`;
+            newCell.innerHTML = `${noteText} <span style="font-size: 0.8em; color: gray;">(${formattedDate})</span>`;
+
+            // Set a background color for the note
             newCell.style.backgroundColor = '#ffffff85'; // color
             newCell.style.padding = '10px'; // Add some padding for the note
 
@@ -56,7 +56,7 @@ function addNote(tableId) {
             alert("Please enter a note!");
         }
     }
-
+            
     // When the user clicks "Submit"
     submitButton.addEventListener('click', submitNote);
 
@@ -74,45 +74,34 @@ function saveNoteToFirebase(tableId, noteText, formattedDate) {
     const noteData = {
         text: noteText,
         date: formattedDate,
-        votes: { thumbsUp: 0, thumbsDown: 0 }
+        votes: {
+            thumbsUp: 0,
+            thumbsDown: 0
+        }
     };
 
     // Save the note under the correct tableId in Firebase
-    const tableRef = ref(database, tableId);
-    push(tableRef, noteData)
-        .then(() => {
-            console.log("Note successfully saved to Firebase!");
-        })
-        .catch((error) => {
-            console.error("Error saving note to Firebase:", error);
-        });
+    const tableRef = database.ref(tableId);
+    tableRef.push(noteData); // Firebase will automatically generate a unique key
 }
 
-// Function to load notes from Firebase
+// Load notes from Firebase and display them
 function loadNotesFromFirebase() {
     const tableIds = ['table1', 'table2', 'table3', 'table4'];
+
     tableIds.forEach(function (tableId) {
-        const tableRef = ref(database, tableId);
-        onValue(tableRef, function (snapshot) {
+        const tableRef = database.ref(tableId);
+        tableRef.on('child_added', function (snapshot) {
+            const noteData = snapshot.val();
             const tableBody = document.querySelector(`#${tableId} tbody`);
-            tableBody.innerHTML = ''; // Clear current content before adding fetched notes
+            const newRow = document.createElement('tr');
+            const newCell = document.createElement('td');
 
-            snapshot.forEach(function(childSnapshot) {
-                const noteData = childSnapshot.val();
-                const newRow = document.createElement('tr');
-                const newCell = document.createElement('td');
-                newCell.innerHTML = `${noteData.text}<br>(${noteData.date})`;
-                newCell.style.backgroundColor = '#ffffff85';
-                newCell.style.padding = '10px';
-
-                // Add vote counts
-                const voteCount = document.createElement('span');
-                voteCount.innerHTML = `Votes: ${noteData.votes.thumbsUp} 👍 / ${noteData.votes.thumbsDown} 👎`;
-                newCell.appendChild(voteCount);
-
-                newRow.appendChild(newCell);
-                tableBody.appendChild(newRow);
-            });
+            newCell.innerHTML = `${noteData.text} <span style="font-size: 0.8em; color: gray;">(${noteData.date})</span>`;
+            newCell.style.backgroundColor = '#ffffff85';
+            newCell.style.padding = '10px';
+            newRow.appendChild(newCell);
+            tableBody.appendChild(newRow);
         });
     });
 }
