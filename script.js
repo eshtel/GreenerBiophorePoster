@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getDatabase, ref, push, onChildAdded, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -20,18 +20,18 @@ const database = getDatabase(app);
 // Function to add a note
 function addNote(tableId) {
     const tableBody = document.querySelector(`#${tableId} tbody`);
-    
+
     const newRow = document.createElement('tr');
     const newCell = document.createElement('td');
-    
+
     const textarea = document.createElement('textarea');
     textarea.placeholder = 'Type your note here...';
     newCell.appendChild(textarea);
-    
+
     const submitButton = document.createElement('button');
     submitButton.innerText = 'Submit';
     newCell.appendChild(submitButton);
-    
+
     newRow.appendChild(newCell);
     tableBody.appendChild(newRow);
 
@@ -40,12 +40,12 @@ function addNote(tableId) {
         if (noteText) {
             const now = new Date();
             const formattedDate = now.toLocaleString();
-            
-            newCell.innerHTML = `${noteText} <span style="font-size: 0.8em; color: gray;">(${formattedDate})</span>`;
-            newCell.style.backgroundColor = '#ffffff85';
-            newCell.style.padding = '10px';
 
+            // 🚀 Don't add the note manually! Let Firebase handle it.
             saveNoteToFirebase(tableId, noteText, formattedDate);
+
+            // ✅ Clear input after submission
+            newRow.remove();
         } else {
             alert("Please enter a note!");
         }
