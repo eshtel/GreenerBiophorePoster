@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { getDatabase, ref, push, onChildAdded, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -56,7 +56,11 @@ function addNote(tableId) {
 function saveNoteToFirebase(tableId, noteText, formattedDate) {
     const noteData = {
         text: noteText,
-        date: formattedDate
+        date: formattedDate,
+        votes: {
+            thumbsUp: 0,
+            thumbsDown: 0
+        }
     };
 
     const tableRef = ref(database, tableId);
@@ -72,6 +76,7 @@ function loadNotesFromFirebase() {
         
         onChildAdded(tableRef, (snapshot) => {
             const noteData = snapshot.val();
+            const noteId = snapshot.key;
 
             const tableBody = document.querySelector(`#${tableId} tbody`);
             const newRow = document.createElement('tr');
@@ -81,10 +86,87 @@ function loadNotesFromFirebase() {
             newCell.style.backgroundColor = '#ffffff85';
             newCell.style.padding = '10px';
 
+            // Add vote buttons (Thumbs Up and Thumbs Down)
+            const voteContainer = document.createElement('div');
+
+            const thumbsUpButton = document.createElement('button');
+            thumbsUpButton.innerHTML = '👍';
+            thumbsUpButton.style.marginRight = '10px';
+            voteContainer.appendChild(thumbsUpButton);
+
+            const thumbsDownButton = document.createElement('button');
+            thumbsDownButton.innerHTML = '👎';
+            voteContainer.appendChild(thumbsDownButton);
+
+            // Add vote counts
+            const voteCount = document.createElement('span');
+            voteCount.style.marginLeft = '10px';
+            voteCount.innerHTML = `Votes: <span class="thumbsUpCount">${noteData.votes.thumbsUp}</span> 👍 / <span class="thumbsDownCount">${noteData.votes.thumbsDown}</span> 👎`;
+            voteContainer.appendChild(voteCount);
+
+            // Append the vote container to the note cell
+            newCell.appendChild(voteContainer);
             newRow.appendChild(newCell);
             tableBody.appendChild(newRow);
+
+            // Prevent user from voting more than once
+            if (hasUserVoted(noteId)) {
+                thumbsUpButton.disabled = true;
+                thumbsDownButton.disabled = true;
+            }
+
+            // Handle voting for thumbs up
+            thumbsUpButton.addEventListener('click', function () {
+                if (!hasUserVoted(noteId)) {
+                    noteData.votes.thumbsUp++;
+                    updateVoteInFirebase(tableId, noteId, noteData.votes);
+                    saveVoteStatus(noteId); // Save user's vote to prevent multiple votes
+
+                    // Update the UI with new vote counts
+                    const thumbsUpElements = newCell.querySelectorAll('.thumbsUpCount');
+                    thumbsUpElements.forEach(function (thumbsUpElement) {
+                        thumbsUpElement.innerText = noteData.votes.thumbsUp;
+                    });
+                }
+            });
+
+            // Handle voting for thumbs down
+            thumbsDownButton.addEventListener('click', function () {
+                if (!hasUserVoted(noteId)) {
+                    noteData.votes.thumbsDown++;
+                    updateVoteInFirebase(tableId, noteId, noteData.votes);
+                    saveVoteStatus(noteId); // Save user's vote to prevent multiple votes
+
+                    // Update the UI with new vote counts
+                    const thumbsDownElements = newCell.querySelectorAll('.thumbsDownCount');
+                    thumbsDownElements.forEach(function (thumbsDownElement) {
+                        thumbsDownElement.innerText = noteData.votes.thumbsDown;
+                    });
+                }
+            });
         });
     });
+}
+
+// Update vote counts in Firebase
+function updateVoteInFirebase(tableId, noteId, updatedVotes) {
+    const noteRef = ref(database, `${tableId}/${noteId}`);
+    update(noteRef, {
+        votes: updatedVotes
+    });
+}
+
+// Save vote status to localStorage
+function saveVoteStatus(noteId) {
+    let votedNotes = JSON.parse(localStorage.getItem("votedNotes")) || [];
+    votedNotes.push(noteId);
+    localStorage.setItem("votedNotes", JSON.stringify(votedNotes));
+}
+
+// Check if user has voted on a note
+function hasUserVoted(noteId) {
+    let votedNotes = JSON.parse(localStorage.getItem("votedNotes")) || [];
+    return votedNotes.includes(noteId);
 }
 
 // Make addNote globally accessible
