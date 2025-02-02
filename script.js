@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getDatabase, ref, push, onChildAdded, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { getDatabase, ref, push, onChildAdded, update, orderByChild, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -41,7 +41,7 @@ function addNote(tableId) {
             const now = new Date();
             const formattedDate = now.toLocaleString();
 
-            // 🚀 Don't add the note manually! Let Firebase handle it.
+            // 🚀 Save the note to Firebase
             saveNoteToFirebase(tableId, noteText, formattedDate);
 
             // ✅ Clear input after submission
@@ -67,13 +67,14 @@ function saveNoteToFirebase(tableId, noteText, formattedDate) {
     push(tableRef, noteData);
 }
 
-// Load notes from Firebase
+// Load notes from Firebase and order them by thumbsUp votes (most to least)
 function loadNotesFromFirebase() {
     const tableIds = ['table1', 'table2', 'table3', 'table4'];
 
     tableIds.forEach(tableId => {
         const tableRef = ref(database, tableId);
-        
+
+        // Query Firebase to order the notes by thumbsUp votes in descending order
         onChildAdded(tableRef, (snapshot) => {
             const noteData = snapshot.val();
             const noteId = snapshot.key;
@@ -172,4 +173,5 @@ function hasUserVoted(noteId) {
 // Make addNote globally accessible
 window.addNote = addNote;
 
+// Load the notes when the window loads
 window.onload = loadNotesFromFirebase;
